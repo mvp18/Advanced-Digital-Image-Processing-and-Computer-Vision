@@ -34,6 +34,7 @@ def scaling(image, sigmag = 3, k = 5):
     return scaled
 
 def scaled_bilateral_filtering(image, sigmas = 4, sigmar = 12, sigmag = 3, k = 5):
+    
     kernel = gaussian(k,k,sigmag)
     imgn = image / 255.0
     scaled = filter2D(imgn,kernel)
@@ -95,4 +96,54 @@ def edge_sobel(image):
     
     grads = np.sqrt(Ix**2 + Iy**2)
     return grads
+
+def connected_component(image):
+
+    r, c = image.shape
+    count=1
+
+    visited = np.zeros([r, c])
+
+    for i in range(r):
+        for j in range(c):
+            if isvalid(i, j, r, c):
+                if (visited[i][j]==0 and image[i][j]==255):
+                    visited = dfs_visit(image, visited, i, j, count)
+                    count+=1
+    return visited
+
+def otsu(image):
+
+    hist, _ = np.histogram(image, bins=256, range=(0, 255))
+    total = image.shape[0]*image.shape[1]
+    current_max, threshold = 0, 0
+    sumT, sumF, sumB = 0, 0, 0
+    
+    for i in range(0,256):
+        sumT += i * hist[i]
+    
+    weightB, weightF = 0, 0
+    varBetween, meanB, meanF = 0, 0, 0
+    
+    for i in range(0,256):
+        weightB += hist[i]
+        weightF = total - weightB
+        if weightF == 0:
+            break
+        sumB += i*hist[i]
+        sumF = sumT - sumB
+        meanB = sumB/weightB
+        meanF = sumF/weightF
+        varBetween = weightB * weightF
+        varBetween *= (meanB-meanF)*(meanB-meanF)
+        if varBetween > current_max:
+            current_max = varBetween
+            threshold = i  
+    
+    th = image
+    th[th>=threshold]=255
+    th[th<threshold]=0
+    
+    return th
+
 

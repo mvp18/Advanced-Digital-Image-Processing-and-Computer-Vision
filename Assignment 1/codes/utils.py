@@ -25,3 +25,15 @@ def gaussian(m, n, sigma = 1):
             num = np.exp(-(i**2 + j**2) / (2*(sigma**2)))
             g[i+m][j+n] = num / den
     return g
+
+def dfs_visit(image, visited, i, j, count):
+
+    r, c = image.shape
+    visited[i][j] = 255
+    for k in range(i-1, i+2):
+        for l in range(j-1, j+2):
+            if isvalid(k, l, r, c):
+                if (visited[i][j]==0 and image[i][j]==255):
+                    dfs_visit(image, visited, k, l, count)
+
+    return visited
