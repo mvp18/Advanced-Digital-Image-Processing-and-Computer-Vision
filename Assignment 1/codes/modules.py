@@ -146,4 +146,46 @@ def otsu(image):
     
     return th
 
+def erosion(image, kernel_size = 3):
+    eroded = image.copy()
+    dx, dy = kernel_size//2, kernel_size//2
+    r, c = image.shape
+    for i in range(r):
+        for j in range(c):
+            if image[i][j] == 255:
+                flag = 0
+                for k in range(i-dx,i+dx+1):
+                    for l in range(j-dy,j+dy+1):
+                        if isvalid(k,l,r,c):
+                            if image[k][l] == 0:
+                                flag = flag or 1
+                if flag == 1:
+                    eroded[i][j] = 0
+    return eroded
 
+def dilation(image, kernel_size = 3):
+    dilated = image.copy()
+    dx, dy = kernel_size//2, kernel_size//2
+    r, c = image.shape
+    for i in range(r):
+        for j in range(c):
+            if image[i][j] == 0:
+                flag = 0
+                for k in range(i-dx,i+dx+1):
+                    for l in range(j-dy,j+dy+1):
+                        if isvalid(k,l,r,c):
+                            if image[k][l] == 255:
+                                flag = flag or 1
+                if flag == 1:
+                    dilated[i][j] = 255
+    return dilated
+
+def opening(image, kernel_size = 3):
+    eroded = erosion(image, kernel_size)
+    opened = dilation(image, kernel_size)
+    return opened
+
+def closing(image, kernel_size = 3):
+    dilated = dilation(image, kernel_size)
+    closed = eroded(image, kernel_size)
+    return closed
