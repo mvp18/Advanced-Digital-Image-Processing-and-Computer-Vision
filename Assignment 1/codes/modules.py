@@ -185,7 +185,7 @@ def opening(image, kernel_size = 3):
 
 def closing(image, kernel_size = 3):
     dilated = dilation(image, kernel_size)
-    closed = eroded(image, kernel_size)
+    closed = erosion(image, kernel_size)
     return closed
 
 def harris(img, threshold=1e-2, nms_size=10):
@@ -194,7 +194,7 @@ def harris(img, threshold=1e-2, nms_size=10):
     blur = scaling(img_gray, 3, 5)
     otsu_thresh = otsu(blur)
     
-    Ix, Iy, _ = edge_sobel(blur)
+    Ix, Iy, _ = edge_sobel(otsu_thresh)
     Ixx = scaling(Ix*Ix, 3, 5)
     Ixy = scaling(Ix*Iy, 3, 5)
     Iyy = scaling(Iy*Iy, 3, 5)
@@ -223,7 +223,7 @@ def harris(img, threshold=1e-2, nms_size=10):
     corners_x,corners_y = np.nonzero(new_Rs)
 
     for x,y in zip(corners_x, corners_y):
-        img_copy_for_corners=cv2.circle(img_copy_for_corners, (x,y), 4, (255,0,0), -1)
+        img_copy_for_corners=cv2.circle(img_copy_for_corners, (y,x), 4, (255,0,0), -1)
         
     return img_copy_for_corners
 

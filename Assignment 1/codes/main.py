@@ -36,12 +36,23 @@ while(1):
 			save_dir = '../images'
 			if not os.path.exists(save_dir):
 				os.makedirs(save_dir)
-			plt.imsave(save_dir+'/'+img_name, np.uint8(img), cmap=cmap)
+			plt.imsave(save_dir+'/'+img_name, img, cmap=cmap)
 			print('\nImage saved! Check images folder.')
 		else:
 			plt.axis("off")
-			plt.imshow(np.uint8(img), cmap=cmap)
+			plt.imshow(img, cmap=cmap)
 			plt.show()
+
+	if operation not in [0, 1, 10]:
+		img_gray = convert_to_grayscale(imgcv)
+		filtered = scaling(img_gray, 3, 5)
+		sharpened = sharpen(filtered)
+	if operation>=4 and operation<=9:
+		filename = '../images/otsu.png'
+		if os.path.isfile(filename):
+			otsu_thresh = cv2.imread(filename, 0)
+		else:
+			otsu_thresh = otsu(sharpened)
 
 	if operation==0:
 		img_gray = convert_to_grayscale(imgcv)
@@ -53,54 +64,32 @@ while(1):
 		show_or_print('bilateralfiltered(4,12,3,5x5).png', filtered, cmap='gray')
 
 	if operation==2:
-		img_gray = convert_to_grayscale(imgcv)
-		sharpened = sharpen(img_gray)
 		show_or_print('sharpened.png', sharpened, cmap='gray')
 
 	if operation==3:
-		img_gray = convert_to_grayscale(imgcv)
-		sharpened = sharpen(img_gray)
 		_, _, grads = edge_sobel(sharpened)
 		show_or_print('sobeledges.png',grads, cmap='gray')
 
 	if operation==4:
-		img_gray = convert_to_grayscale(imgcv)
-		sharpened = sharpen(img_gray)
-		otsu_thresh = otsu(sharpened)
 		show_or_print('otsu.png', otsu_thresh, cmap='gray')
 
 	if operation==5:
-		img_gray = convert_to_grayscale(imgcv)
-		sharpened = sharpen(img_gray)
-		otsu_thresh = otsu(sharpened)
 		cc = connected_component(otsu_thresh)
 		show_or_print('connected_component.png', cc, cmap='gray')
 
 	if operation==6:
-		img_gray = convert_to_grayscale(imgcv)
-		sharpened = sharpen(img_gray)
-		otsu_thresh = otsu(sharpened)
 		eroded = erosion(otsu_thresh, 3)
 		show_or_print('eroded.png', eroded, cmap='gray')
 
 	if operation==7:
-		img_gray = convert_to_grayscale(imgcv)
-		sharpened = sharpen(img_gray)
-		otsu_thresh = otsu(sharpened)
 		dilated = dilation(otsu_thresh, 3)
 		show_or_print('dilated.png', dilated, cmap='gray')
 
 	if operation==8:
-		img_gray = convert_to_grayscale(imgcv)
-		sharpened = sharpen(img_gray)
-		otsu_thresh = otsu(sharpened)
 		opened = opening(otsu_thresh, 3)
 		show_or_print('opened.png', opened, cmap='gray')
 
 	if operation==9:
-		img_gray = convert_to_grayscale(imgcv)
-		sharpened = sharpen(img_gray)
-		otsu_thresh = otsu(sharpened)
 		closed = closing(otsu_thresh, 3)
 		show_or_print('closed.png', closed, cmap='gray')
 
