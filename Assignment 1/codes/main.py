@@ -45,8 +45,8 @@ while(1):
 
 	if operation not in [0, 1, 10]:
 		img_gray = convert_to_grayscale(imgcv)
-		filtered = scaling(img_gray, 3, 5)
-		sharpened = sharpen(filtered)
+		blur = scaling(img_gray, 3, 5)
+		sharpened = sharpen(blur)
 	if operation>=4 and operation<=9:
 		filename = '../images/otsu.png'
 		if os.path.isfile(filename):
@@ -67,7 +67,7 @@ while(1):
 		show_or_print('sharpened.png', sharpened, cmap='gray')
 
 	if operation==3:
-		_, _, grads = edge_sobel(sharpened)
+		_, _, grads = edge_sobel(blur)
 		show_or_print('sobeledges.png',grads, cmap='gray')
 
 	if operation==4:
