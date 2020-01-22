@@ -1,13 +1,11 @@
 import numpy as np
-import cv2 as cv
-import matplotlib.pyplot as plt
+import cv2
 from utils import *
 
 def convert_to_grayscale(image):
     B = image[:,:,0]
     G = image[:,:,1]
     R = image[:,:,2]
-    img_gray = np.zeros(image.shape)
     img_gray = 0.2989*R + 0.5870*G + 0.1140*B
     img_gray = img_gray.astype('uint8')
     return img_gray
@@ -29,8 +27,7 @@ def filter2D(image, kernel):
 
 def scaling(image, sigmag = 3, k = 5):
     kernel = gaussian(k,k,sigmag)
-    imgn = image / 255.0
-    scaled = filter2D(imgn,kernel)
+    scaled = filter2D(image,kernel)
     return scaled
 
 def scaled_bilateral_filtering(image, sigmas = 4, sigmar = 12, sigmag = 3, k = 5):
@@ -95,7 +92,7 @@ def edge_sobel(image):
     Iy = filter2D(image, Sy)
     
     grads = np.sqrt(Ix**2 + Iy**2)
-    return grads
+    return Ix, Iy, grads
 
 def connected_component(image):
 
@@ -123,19 +120,20 @@ def otsu(image):
         sumT += i * hist[i]
     
     weightB, weightF = 0, 0
-    varBetween, meanB, meanF = 0, 0, 0
     
     for i in range(0,256):
         weightB += hist[i]
         weightF = total - weightB
-        if weightF == 0:
+        if weightF == 0: # only background pixels
             break
+        
         sumB += i*hist[i]
         sumF = sumT - sumB
+        
         meanB = sumB/weightB
-        meanF = sumF/weightF
-        varBetween = weightB * weightF
-        varBetween *= (meanB-meanF)*(meanB-meanF)
+        meanF = sumF/weightF 
+        
+        varBetween = weightB*weightF*(meanB-meanF)**2
         if varBetween > current_max:
             current_max = varBetween
             threshold = i  
@@ -189,3 +187,43 @@ def closing(image, kernel_size = 3):
     dilated = dilation(image, kernel_size)
     closed = eroded(image, kernel_size)
     return closed
+
+def harris(img, threshold=1e-2, nms_size=10):
+    
+    img_gray = convert_to_grayscale(img)
+    blur = scaling(img_gray, 3, 5)
+    otsu_thresh = otsu(blur)
+    
+    Ix, Iy, _ = edge_sobel(blur)
+    Ixx = scaling(Ix*Ix, 3, 5)
+    Ixy = scaling(Ix*Iy, 3, 5)
+    Iyy = scaling(Iy*Iy, 3, 5)
+    
+    detA = Ixx*Iyy - Ixy**2
+    traceA = Ixx + Iyy
+    Rs = detA - 0.05*traceA**2
+    
+    img_copy_for_corners = np.copy(img)    
+    
+    # thresholding
+    Rs = Rs * (Rs > (threshold * Rs.max())) * (Rs > 0)
+    
+    # Non maxima suppression
+    rows, columns = np.nonzero(Rs)
+    new_Rs = np.zeros(Rs.shape)
+    for r,c in zip(rows,columns):
+        minr = max(0, r - nms_size / 2)
+        maxr = min(img.shape[0], minr + nms_size)
+        minc = max(0, c - nms_size / 2)
+        maxc = min(img.shape[1], minc + nms_size)
+        if Rs[r,c] == Rs[int(minr):int(maxr),int(minc):int(maxc)].max():
+            new_Rs[r,c] = Rs[r,c]
+   
+    # Corners found
+    corners_x,corners_y = np.nonzero(new_Rs)
+
+    for x,y in zip(corners_x, corners_y):
+        img_copy_for_corners=cv2.circle(img_copy_for_corners, (x,y), 4, (255,0,0), -1)
+        
+    return img_copy_for_corners
+

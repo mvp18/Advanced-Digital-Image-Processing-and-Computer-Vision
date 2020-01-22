@@ -1,6 +1,4 @@
 import numpy as np
-import cv2 as cv
-import matplotlib.pyplot as plt
 
 def isvalid(i, j, r, c):
     if i >= r or j >= c or i < 0 or j < 0:
