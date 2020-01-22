@@ -25,23 +25,22 @@ op_dict = {'0':'Convert to grayscale',
 for k, v in op_dict.items():
 	print(k, v)
 
+def show_or_print(img_name, img, cmap):
+	ans = int(input('\nSave(0) or Show(1) image? '))
+	if ans==0:
+		save_dir = '../images'
+		if not os.path.exists(save_dir):
+			os.makedirs(save_dir)
+		plt.imsave(save_dir+'/'+img_name, img, cmap=cmap)
+		print('\nImage saved! Check images folder.')
+	else:
+		plt.axis("off")
+		plt.imshow(img, cmap=cmap)
+		plt.show()
+
 while(1):
 
-	operation = input('\nEnter operation you wish to perform:')
-	operation = int(operation)
-
-	def show_or_print(img_name, img, cmap):
-		ans = input('\nSave(0) or Show(1) image? ')
-		if ans=='0':
-			save_dir = '../images'
-			if not os.path.exists(save_dir):
-				os.makedirs(save_dir)
-			plt.imsave(save_dir+'/'+img_name, img, cmap=cmap)
-			print('\nImage saved! Check images folder.')
-		else:
-			plt.axis("off")
-			plt.imshow(img, cmap=cmap)
-			plt.show()
+	operation = int(input('\nEnter operation you wish to perform:'))
 
 	if operation not in [0, 1, 10]:
 		img_gray = convert_to_grayscale(imgcv)
@@ -97,8 +96,8 @@ while(1):
 		harris_img = harris(imgcv, 1e-2, 10)
 		show_or_print('harris.png', harris_img, cmap=None)
 
-	ans = input('\nTry other operations (0) or exit (1)? ')
-	if ans=='0':
+	ans = int(input('\nTry other operations (0) or exit (1)? '))
+	if ans==0:
 		continue
 	else:
 		break

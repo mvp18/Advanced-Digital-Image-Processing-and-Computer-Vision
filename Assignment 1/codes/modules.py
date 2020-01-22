@@ -223,7 +223,7 @@ def harris(img, threshold=1e-2, nms_size=10):
     corners_x,corners_y = np.nonzero(new_Rs)
 
     for x,y in zip(corners_x, corners_y):
-        img_copy_for_corners=cv2.circle(img_copy_for_corners, (y,x), 4, (255,0,0), -1)
+        img_copy_for_corners=cv2.circle(img_copy_for_corners, (y,x), 2, (255,0,0), -1)
         
     return img_copy_for_corners
 
