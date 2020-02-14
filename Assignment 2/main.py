@@ -10,9 +10,11 @@ def main(args):
 		task1(img)
 	if args.task_num==1:
 		img = cv2.imread('Garden.JPG')
-		task2_3(img)
+		save_img, _, _ = task2_3(img)
+		cv2.imwrite('Garden_with_vanishing_line.png', save_img)
+		print('Image saved to disk!')
 	if args.task_num==2:
-		img = cv2.imread('Garden_with_vanishing_line.png')
+		img = cv2.imread('Garden.JPG')
 		task4(img)
 	if args.task_num==3:
 		img = cv2.imread('Garden_cropped.jpg')

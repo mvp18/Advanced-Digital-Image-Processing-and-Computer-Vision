@@ -13,6 +13,7 @@ def task1(img):
                 cv2.circle(img,(x,y), 4, (0, 255, 0), -1)
                 self.points.append((x,y))
 
+    print('Select any points on the image. Then the corressponding line will be displayed and its eqn in the terminal. Press Esc to exit.')
     #instantiate class
     pt_store = CoordinateStore()
     cv2.namedWindow('image')
@@ -51,6 +52,8 @@ def task2_3(img):
                 cv2.circle(img, (x,y), 4, self.color, -1)
                 self.points.append((x,y))
 
+    print('Select 2 sets of parallel lines (4 in total). This generates the vanishing line. A line parallel to it and passing through img centre will be displayed.')
+    print('Further instructions follow!')
     #instantiate class
     clone = img.copy()
     line_pairs=[]
@@ -61,7 +64,7 @@ def task2_3(img):
             print('\nNow select 2nd parallel pair (4 points in order). Press Esc once done.')
         else:
             pt_store = CoordinateStore((0, 255, 0))
-            print('\nSelect 1st parallel line pair (4 points in order). Press Esc once done.')
+            print('\nSelect 1st parallel line pair (4 points in order). The 2 lines will be displayed once u select all 4. Press Esc once done.')
         
         img = clone.copy()
         cv2.namedWindow('image')
@@ -109,12 +112,14 @@ def task2_3(img):
     cv2.imshow('image', img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-    cv2.imwrite('Garden_with_vanishing_line.png', img)
-    print('Image saved to disk!')
+
+    return img, m_inf, c_inf
+    
 
 def task4(img):
 
-    clone = img.copy()
+    img_vline, m_inf, c_inf = task2_3(img)
+    clone = img_vline.copy()
 
     class CoordinateStore:
         def __init__(self, color):
@@ -123,7 +128,7 @@ def task4(img):
 
         def select_point(self, event, x, y, flags, param):
             if event == cv2.EVENT_LBUTTONDOWN:
-                cv2.circle(img, (x,y), 4, self.color, -1)
+                cv2.circle(img_vline, (x,y), 4, self.color, -1)
                 self.point = (x,y)
     
     #instantiate class
@@ -132,14 +137,16 @@ def task4(img):
     cv2.setMouseCallback('image', pt_store.select_point)
 
     print('Select any point on the green line in the image. Press c once done to break. Note that the last selected point will be used!')
-    
+    print('Three sets of parallel transformed lines will be shown passing through this point!')
     while(1):    
-        cv2.imshow('image',img)
+        cv2.imshow('image', img_vline)
         k = cv2.waitKey(20) & 0xFF
         if k == ord("c"): # Press c to break
             break
 
-    (k, h) = pt_store.point
+    (k, h_) = pt_store.point
+    h = (k - c_inf)/m_inf
+    
     print(h, k)
     
     P = np.array([[h], [k], [1]])
@@ -186,9 +193,9 @@ def task4(img):
         hi = h + scale_arr[i]
         ki = mi*scale_arr[i] + k
 
-        cv2.line(img, (k, h), (int(ki), int(hi)), color_arr[i], 2)
+        cv2.line(img, (int(k), int(h)), (int(ki), int(hi)), color_arr[i], 2)
     
-    cv2.circle(img, (k, h), 4, (0, 0, 255), -1)
+    cv2.circle(img, (int(k), int(h)), 4, (0, 0, 255), -1)
     cv2.imshow('image', img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
@@ -196,6 +203,9 @@ def task4(img):
     print('Image saved to disk!')
 
 def task5(img):
+
+    print('Here u will need 2 sets of parallel lines similar to task 2_3. This will be needed for affine rectification on the cropped image.')
+    print('Note we have cropped out only the ground portion of the garden for this task (as suggested in the assignment).')
 
     class CoordinateStore:
         def __init__(self, color):
@@ -252,3 +262,4 @@ def task5(img):
     res = homography(img, corr)
 
     cv2.imwrite('garden_rect_color.png', res)
+    print('Image saved to disk!')
