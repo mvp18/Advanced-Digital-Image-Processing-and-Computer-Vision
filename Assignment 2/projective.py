@@ -131,7 +131,7 @@ def task4(point):
         [4,5,6],
         [l1,l2,1]
     ])
-    P_ = matrix.dot(P)
+    P_ = H.dot(P)
     
     #The point (h,k) gets mapped to (b,-a) which is also the slope of the parallel lines
     b, a = P_[0,0], -P_[1,0]
@@ -154,4 +154,5 @@ def task4(point):
     l2i = Ht.dot(l2)
     
     print("L1 :")
+    print(str(l1i[0][0]) + 'x + ' + str(l1i[1][0]) + "y + " + str(l1i[2][0]) + " = 0")
     
