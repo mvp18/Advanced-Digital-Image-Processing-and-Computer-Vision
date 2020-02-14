@@ -117,3 +117,41 @@ plt.imsave('chess_homo.png', res2, cmap = 'gray')
 
 plt.imshow(res3, cmap = 'gray')
 plt.imsave('chess_homo_corrected.png', res3, cmap = 'gray')
+
+def task4(point):
+    h, k = point
+    P = np.array([[h], [k], [1]])
+    l2 = 1e-3
+    l1 = (-1 - l2 * k) / h
+    
+    #First two rows of the matrix are random, third row is chosen to make
+    #3rd coordinate = 0 as it will be transformed to an ideal point
+    H = np.array([
+        [1,2,3],
+        [4,5,6],
+        [l1,l2,1]
+    ])
+    P_ = matrix.dot(P)
+    
+    #The point (h,k) gets mapped to (b,-a) which is also the slope of the parallel lines
+    b, a = P_[0,0], -P_[1,0]
+    
+    #Choose two arbitrary c1 and c2 that correspond to ax + by + c1 = 0 and ax + by + c2 = 0 in real world
+    c1 = 100
+    c2 = 100
+    
+    #The lines arrays to be transformed back to image plane
+    l1 = np.array([[a], [b], [c1]])
+    l2 = np.array([[a], [b], [c2]])
+    
+    #Matrix to transform real world coordinates to image plane coordinates
+    Hinv = np.linalg.inv(mat)
+    
+    #Since lines transform a/c to Hinverse here inverse(Hinv) = H
+    Ht = H.transpose()
+    
+    l1i = Ht.dot(l1)
+    l2i = Ht.dot(l2)
+    
+    print("L1 :")
+    
