@@ -33,7 +33,7 @@ def task1(img):
 	
 	slope = (pt_store.points[1][0]-pt_store.points[0][0])/(pt_store.points[1][1]-pt_store.points[0][1])
 	intercept = pt_store.points[0][0] - slope*pt_store.points[0][1]
-	print("Line equation: ")
+	print("Equation of displayed line: ")
 	print('y = ' + str(slope) + "x" + ["", "+"][intercept > 0] + str(intercept))
 
 	cv2.waitKey(0)
@@ -104,11 +104,66 @@ def task2_3(img):
 	y2 = w
 	x2 = (w - y_c)/m_inf + x_c
 	
-	print(y1, x1)
-	print(y2, x2)
-	
 	img = clone.copy()
 	cv2.line(img, (int(y1), int(x1)), (int(y2), int(x2)), (0, 255, 0), 2)
 	cv2.imshow('image', img)
 	cv2.waitKey(0)
 	cv2.destroyAllWindows()
+
+def task5(img):
+
+	class CoordinateStore:
+	    def __init__(self, color):
+	        self.points = []
+	        self.color = color
+
+	    def select_point(self, event, x, y, flags, param):
+	        if event == cv2.EVENT_LBUTTONDOWN:
+	            cv2.circle(img, (x,y), 4, self.color, -1)
+	            self.points.append((x,y))
+
+	clone = img.copy()
+	line_pairs=[]
+	
+	for i in [0, 1]:
+		if(i):
+			pt_store = CoordinateStore((0, 0, 255))
+			print('\nNow select 2nd parallel pair (4 points in order). Press Esc once done.')
+		else:
+			pt_store = CoordinateStore((0, 255, 0))
+			print('\nSelect 1st parallel line pair (4 points in order). Press Esc once done.')
+		
+		img = clone.copy()
+		cv2.namedWindow('image')
+		# cv2.namedWindow('image', cv2.WINDOW_NORMAL)
+		cv2.setMouseCallback('image', pt_store.select_point)
+		
+		while(1):
+		    cv2.imshow('image',img)
+		    k = cv2.waitKey(20) & 0xFF
+		    if k == ord("c") or len(pt_store.points)==4:
+		        break
+		line_pairs.append(pt_store.points)
+		
+		if(i):
+			cv2.line(img, pt_store.points[0], pt_store.points[1], (0, 0, 255), 2)
+			cv2.line(img, pt_store.points[2], pt_store.points[3], (0, 0, 255), 2)
+		else:
+			cv2.line(img, pt_store.points[0], pt_store.points[1], (0, 255, 0), 2)
+			cv2.line(img, pt_store.points[2], pt_store.points[3], (0, 255, 0), 2)
+
+		cv2.imshow('image', img)
+		cv2.waitKey(0)
+		cv2.destroyAllWindows()
+
+	pl1 = extract_lines(line_pairs[0], 0)
+	pl2 = extract_lines(line_pairs[0], 2)
+	pl3 = extract_lines(line_pairs[1], 0)
+	pl4 = extract_lines(line_pairs[1], 2)
+	
+	img = clone.copy()
+	corr = rectification_matrix(pl1, pl2, pl3, pl4)
+	print(corr)
+	res = homography(img, corr)
+
+	cv2.imwrite('garden_rect_color.png', res)

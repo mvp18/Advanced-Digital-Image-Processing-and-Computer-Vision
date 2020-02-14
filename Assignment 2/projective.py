@@ -29,8 +29,6 @@ def isvalid(i, j, r, c):
 def homography(img, matrix):
     res = np.zeros(img.shape)
     r, c = img.shape
-    countval = 0
-    countwhite = 0
     for i in range(r):
         for j in range(c):
             x = np.array([[i], [j], [1]])
