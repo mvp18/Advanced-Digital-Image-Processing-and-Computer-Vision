@@ -2,6 +2,7 @@ import cv2
 import matplotlib.pyplot as plt
 import argparse
 from modules import *
+from utils import *
 
 def main(args):
 
@@ -12,6 +13,10 @@ def main(args):
 		X1, X2 = compute_SURF_ckp(img1, img2, args.save_flag)	
 	else:
 		X1, X2 = compute_SIFT_ckp(img1, img2, args.save_flag)
+
+	fundamental_matrix = solve_8pt_corr(X1, X2)
+
+	draw_epipolar_lines(X1, X2, fundamental_matrix, img1, img2)
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description="Implementation of tasks in Assignment 3.")
