@@ -1,71 +1,4 @@
-import cv2
-import matplotlib.pyplot as plt
 from utils import *
-
-def FLANN_matcher(img1, img2, kp1, kp2, des1, des2):
-
-	FLANN_INDEX_KDTREE = 1
-	index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
-	search_params = dict(checks=100)
-
-	flann = cv2.FlannBasedMatcher(index_params, search_params)
-
-	matches = flann.knnMatch(des1, des2, k=2)
-
-	# Need to draw only good matches, so create a mask
-	matchesMask = [[0,0] for i in range(len(matches))]
-	num_matches=0
-	# ratio test as per Lowe's paper
-	for i,(m,n) in enumerate(matches):
-		if m.distance < 0.7*n.distance:
-			print('M:')
-			print(m.trainIdx, m.queryIdx, m.imgIdx)
-			print('N:')
-			print(n.trainIdx, n.queryIdx, n.imgIdx)
-			matchesMask[i]=[1,0]
-			num_matches+=1
-
-	print(num_matches)
-	draw_params = dict(matchColor = (0,255,0),
-					   singlePointColor = (0,0,255),
-					   matchesMask = matchesMask,
-					   flags = 0)
-
-	img3 = cv2.drawMatchesKnn(img1, kp1, img2, kp2, matches, None, **draw_params)
-
-	return img3
-
-def brute_force_matcher(img1, img2, kp1, kp2, des1, des2):
-
-	bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=True)
-	# Match descriptors.
-	matches = bf.match(des1, des2)
-	print("Number of matching keypoints found:{}".format(len(matches)))
-	# Sort them in the order of their distance.
-	matches = sorted(matches, key = lambda x:x.distance)
-	
-	draw_params = dict(matchColor = (0,255,0), singlePointColor = (0,0,255), flags = 0)
-
-	X1 = []
-	X2 = []
-	
-	# Paramters of Keypoint class - pt, size (diameter of the meaningful keypoint neighborhood), angle
-	# Paramters of DMatch object:
-	# DMatch.distance - Distance between descriptors. The lower, the better it is.
-	# DMatch.trainIdx - Index of the descriptor in train descriptors
-	# DMatch.queryIdx - Index of the descriptor in query descriptors
-	# DMatch.imgIdx - Index of the train image.
-	
-	for i, m in enumerate(matches[:8]):
-		# print(match.trainIdx, match.queryIdx)
-		X1.append((kp1[m.queryIdx].pt[1], kp1[m.queryIdx].pt[0]))
-		X2.append((kp2[m.trainIdx].pt[1], kp2[m.trainIdx].pt[0]))
-
-	img3 = cv2.drawMatches(img1, kp1, img2, kp2, matches[:8], None, **draw_params)
-	
-	return img3, X1, X2
-	# plt.imshow(img3)
-	# plt.show()
 
 def compute_SIFT_ckp(img1, img2, save_flag):
 	
@@ -80,11 +13,11 @@ def compute_SIFT_ckp(img1, img2, save_flag):
 	img1 = cv2.drawKeypoints(gray1, kp1, None, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 	img2 = cv2.drawKeypoints(gray2, kp2, None, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-	# cv2.imshow('SIFT_keypoints1', img1)
-	# cv2.imshow('SIFT_keypoints2', img2)
+	cv2.imshow('SIFT_keypoints1', img1)
+	cv2.imshow('SIFT_keypoints2', img2)
 	
-	# cv2.waitKey(0)
-	# cv2.destroyAllWindows()
+	cv2.waitKey(0)
+	cv2.destroyAllWindows()
 
 	if save_flag:
 		cv2.imwrite('sift_keypoints1.png', img1)
@@ -92,9 +25,9 @@ def compute_SIFT_ckp(img1, img2, save_flag):
 
 	img3, X1, X2 = brute_force_matcher(gray1, gray2, kp1, kp2, des1, des2)
 	
-	# cv2.imshow('matched_pts_sift', img3)
-	# cv2.waitKey(0)
-	# cv2.destroyAllWindows()
+	cv2.imshow('matched_pts_sift', img3)
+	cv2.waitKey(0)
+	cv2.destroyAllWindows()
 
 	if save_flag:
 		cv2.imwrite('matched_pts_sift.png', img3)
@@ -135,7 +68,57 @@ def compute_SURF_ckp(img1, img2, save_flag):
 
 	return X1, X2
 
-def estimate_scene_depth(img1, img2, X1, X2, P1, P2):
+def solve_8pt_corr(X1, X2):
+
+	A = np.array([[X1[i][0]*X2[i][0], X2[i][0]*X1[i][1], X2[i][0], X1[i][0]*X2[i][1], 
+				   X1[i][1]*X2[i][1], X2[i][1], X1[i][0], X1[i][1]] for i in range(len(X1))])
+	f = np.ones([8, 1])*(-1)
+	F = np.matmul(np.linalg.inv(A), f)
+	F = np.append(F, 1)
+	F = F.reshape(3, 3)
+	U, D, VT = np.linalg.svd(F)
+	D_ = np.array([[D[0], 0, 0],
+				   [0, D[1], 0],
+				   [0, 0, 0]])
+
+	F_ = np.matmul(U, np.matmul(D_, VT))
+	print('Determinant of fundamental matrix : {}'.format(np.linalg.det(F_)))
+
+	return F_
+
+def calc_epipoles_from_F(F):
+
+	e = -np.matmul(np.linalg.inv(F[:2, :2]), F[:2, 2])
+	e = np.append(e, 1)
+	print('\nLeft Epipole from F:{}'.format(e))
+	
+	F_T = F.transpose()
+	e_ = -np.matmul(np.linalg.inv(F_T[:2, :2]), F_T[:2, 2])
+	e_ = np.append(e_, 1)
+	print('Right Epipole from F:{}'.format(e_))
+
+	return e, e_
+
+def estimate_proj_matrices(F, e_):
+
+	P = np.zeros((3, 4))
+
+	P[:, :-1] = np.identity(3)
+
+	S = np.array([[0, -e_[2], e_[1]],
+		          [e_[2], 0, -e_[0]],
+		          [-e_[1], e_[0], 0]])
+
+	P_ = np.zeros((3, 4))
+	P_[:, :-1] = np.matmul(S, F)
+	P_[:, -1] = e_
+
+	print('\nCamera Matrix P:\n{}'.format(P))
+	print('\nCamera Matrix P`:\n{}\n'.format(P_))
+
+	return P, P_
+
+def estimate_scene_depth(img1, img2, X1, X2, P1, P2, save_flag):
 
 	img3 = img1
 	img4 = img2
@@ -152,8 +135,15 @@ def estimate_scene_depth(img1, img2, X1, X2, P1, P2):
 		img3 = cv2.circle(img3, (int(y1),int(x1)), 4, colors[i], -1)
 		img4 = cv2.circle(img4, (int(y2),int(x2)), 4, colors[i], -1)
 
-	cv2.imwrite('Img1_Depth_Markers.png', img3)
-	cv2.imwrite('Img2_Depth_Markers.png', img4)
+	cv2.imshow('Img1_Depth_Markers', img3)
+	cv2.imshow('Img2_Depth_Markers', img4)
+	
+	cv2.waitKey(0)
+	cv2.destroyAllWindows()
+
+	if save_flag:
+		cv2.imwrite('Img1_Depth_Markers.png', img3)
+		cv2.imwrite('Img2_Depth_Markers.png', img4)
 
 	for i in range(len(X)):
 		print('Depth of ' + str(names[i]) + ' feature point = ' + str(X[i][2]))

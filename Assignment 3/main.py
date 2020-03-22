@@ -1,5 +1,3 @@
-import cv2
-import matplotlib.pyplot as plt
 import argparse
 from modules import *
 from utils import *
@@ -16,7 +14,7 @@ def main(args):
 
 	fundamental_matrix = solve_8pt_corr(X1, X2)
 
-	e1, e_1 = draw_epipolar_lines(X1, X2, fundamental_matrix, img1, img2)
+	e1, e_1 = draw_epipolar_lines(X1, X2, fundamental_matrix, img1, img2, args.save_flag)
 
 	e2, e_2 = calc_epipoles_from_F(fundamental_matrix)
 
@@ -34,7 +32,7 @@ def main(args):
 		print('Compatibility test passed!\n')
 
 	print('Estimating scene point depths . . .\n')
-	estimate_scene_depth(img1, img2, X1, X2, P, P_)
+	estimate_scene_depth(img1, img2, X1, X2, P, P_, args.save_flag)
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description="Implementation of tasks in Assignment 3.")
