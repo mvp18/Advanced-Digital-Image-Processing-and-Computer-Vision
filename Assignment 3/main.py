@@ -31,7 +31,10 @@ def main(args):
 	S = np.around(S, decimals=6) # 2 values disagree in the 17th place of decimal, hence the limit to 6
 	
 	if (S.transpose() == -S).all(): # property of a skew-symmetric matrix
-		print('Compatibility test passed!')
+		print('Compatibility test passed!\n')
+
+	print('Estimating scene point depths . . .\n')
+	estimate_scene_depth(img1, img2, X1, X2, P, P_)
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description="Implementation of tasks in Assignment 3.")

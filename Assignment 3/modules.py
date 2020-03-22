@@ -1,5 +1,6 @@
 import cv2
 import matplotlib.pyplot as plt
+from utils import *
 
 def FLANN_matcher(img1, img2, kp1, kp2, des1, des2):
 
@@ -133,3 +134,26 @@ def compute_SURF_ckp(img1, img2, save_flag):
 		cv2.imwrite('matched_pts_surf.png', img3)
 
 	return X1, X2
+
+def estimate_scene_depth(img1, img2, X1, X2, P1, P2):
+
+	img3 = img1
+	img4 = img2
+
+	X = give_scene_points(X1, X2, P1, P2)
+
+	colors = [(0,0,255), (0,255,255), (0,255,0), (255,255,0), (255,0,0), (255,0,255), (255,204,204), (255,255,255)]
+	names = ['Red', 'Yellow', 'Green', 'Indigo', 'Blue', 'Pink', 'Light Pink', 'White']
+
+	for i in range(len(X1)):
+		x1, y1 = X1[i]
+		x2, y2 = X2[i]
+
+		img3 = cv2.circle(img3, (int(y1),int(x1)), 4, colors[i], -1)
+		img4 = cv2.circle(img4, (int(y2),int(x2)), 4, colors[i], -1)
+
+	cv2.imwrite('Img1_Depth_Markers.png', img3)
+	cv2.imwrite('Img2_Depth_Markers.png', img4)
+
+	for i in range(len(X)):
+		print('Depth of ' + str(names[i]) + ' feature point = ' + str(X[i][2]))

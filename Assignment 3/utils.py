@@ -49,7 +49,7 @@ def draw_epipolar_lines(X1, X2, F, img1, img2):
 	C_ = np.array([L_[0][2], L_[1][2]])
 	e_ = -np.matmul(np.linalg.inv(AB_.reshape(2, 2)), C_)
 	e_ = np.append(e_, 1)
-	print('Right Epipole from F:{}'.format(e_))
+	print('Right Epipole from Epipolar Lines1:{}'.format(e_))
 
 	# cv2.imshow('Epipolar_lines1', img3)
 	# cv2.imshow('Epipolar_lines2', img4)
@@ -93,3 +93,28 @@ def estimate_proj_matrices(F, e_):
 	print('\nCamera Matrix P`:\n{}\n'.format(P_))
 
 	return P, P_
+
+def give_scene_points(X1, X2, P1, P2):
+	
+    X = []
+    
+    for i in range(len(X1)):
+        x1 = np.array([X1[i][0], X1[i][1]])
+        x2 = np.array([X2[i][0], X2[i][1]])
+
+        A = np.array([
+            x1[0]*P1[2] - P1[0],
+            x1[1]*P1[2] - P1[1],
+            x2[0]*P2[2] - P2[0],
+            x2[1]*P2[2] - P2[1]
+        ])
+
+        U, D, VT = np.linalg.svd(A)
+        V = VT.transpose()
+
+        X_3d = V[:,-1] / V[-1,-1]
+        X_3d = X_3d[:-1]
+
+        X.append(X_3d)
+    
+    return X
