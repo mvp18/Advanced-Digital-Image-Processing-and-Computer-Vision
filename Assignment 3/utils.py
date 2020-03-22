@@ -51,11 +51,14 @@ def draw_epipolar_lines(X1, X2, F, img1, img2):
 	e_ = np.append(e_, 1)
 	print('Right Epipole from F:{}'.format(e_))
 
-	cv2.imshow('Epipolar_lines1', img3)
-	cv2.imshow('Epipolar_lines2', img4)
+	# cv2.imshow('Epipolar_lines1', img3)
+	# cv2.imshow('Epipolar_lines2', img4)
+
+	cv2.imwrite('Epipolar_lines1.png', img3)
+	cv2.imwrite('Epipolar_lines2.png', img4)
 	
-	cv2.waitKey(0)
-	cv2.destroyAllWindows()
+	# cv2.waitKey(0)
+	# cv2.destroyAllWindows()
 
 	return e, e_
 

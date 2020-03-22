@@ -91,9 +91,9 @@ def compute_SIFT_ckp(img1, img2, save_flag):
 
 	img3, X1, X2 = brute_force_matcher(gray1, gray2, kp1, kp2, des1, des2)
 	
-	cv2.imshow('matched_pts_sift', img3)
-	cv2.waitKey(0)
-	cv2.destroyAllWindows()
+	# cv2.imshow('matched_pts_sift', img3)
+	# cv2.waitKey(0)
+	# cv2.destroyAllWindows()
 
 	if save_flag:
 		cv2.imwrite('matched_pts_sift.png', img3)
