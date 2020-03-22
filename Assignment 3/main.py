@@ -16,7 +16,14 @@ def main(args):
 
 	fundamental_matrix = solve_8pt_corr(X1, X2)
 
-	draw_epipolar_lines(X1, X2, fundamental_matrix, img1, img2)
+	e1, e_1 = draw_epipolar_lines(X1, X2, fundamental_matrix, img1, img2)
+
+	e2, e_2 = calc_epipoles_from_F(fundamental_matrix)
+
+	print('\nDistance b/w 2 values for Left Epipole:{}'.format(np.sqrt((e1[0]-e2[0])**2 + (e1[1]-e2[1])**2)))
+	print('Distance b/w 2 values for Right Epipole:{}'.format(np.sqrt((e_1[0]-e_2[0])**2 + (e_1[1]-e_2[1])**2)))
+
+	P, P_ = estimate_proj_matrices(fundamental_matrix, e_2)
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description="Implementation of tasks in Assignment 3.")
