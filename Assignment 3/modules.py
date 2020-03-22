@@ -79,11 +79,11 @@ def compute_SIFT_ckp(img1, img2, save_flag):
 	img1 = cv2.drawKeypoints(gray1, kp1, None, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 	img2 = cv2.drawKeypoints(gray2, kp2, None, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-	cv2.imshow('SIFT_keypoints1', img1)
-	cv2.imshow('SIFT_keypoints2', img2)
+	# cv2.imshow('SIFT_keypoints1', img1)
+	# cv2.imshow('SIFT_keypoints2', img2)
 	
-	cv2.waitKey(0)
-	cv2.destroyAllWindows()
+	# cv2.waitKey(0)
+	# cv2.destroyAllWindows()
 
 	if save_flag:
 		cv2.imwrite('sift_keypoints1.png', img1)
