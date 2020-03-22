@@ -86,7 +86,7 @@ def estimate_proj_matrices(F, e_):
 	P_[:, :-1] = np.matmul(S, F)
 	P_[:, -1] = e_
 
-	print('Camera Matrix P:\n{}'.format(P))
-	print('Camera Matrix P`:\n{}'.format(P_))
+	print('\nCamera Matrix P:\n{}'.format(P))
+	print('\nCamera Matrix P`:\n{}\n'.format(P_))
 
 	return P, P_

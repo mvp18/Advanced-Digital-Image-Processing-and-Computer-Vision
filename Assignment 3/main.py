@@ -25,6 +25,14 @@ def main(args):
 
 	P, P_ = estimate_proj_matrices(fundamental_matrix, e_2)
 
+	#compatibility test
+	S = np.matmul(np.matmul(P_.transpose(), fundamental_matrix), P)
+	S[np.abs(S) < 1e-8] = 0 # limiting very small values to zero for skew-symmetric test
+	S = np.around(S, decimals=6) # 2 values disagree in the 17th place of decimal, hence the limit to 6
+	
+	if (S.transpose() == -S).all(): # property of a skew-symmetric matrix
+		print('Compatibility test passed!')
+
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description="Implementation of tasks in Assignment 3.")
 	parser.add_argument('-dt', '--descriptor_type', help="0 - SIFT , 1 - SURF", default=0, type=int)
