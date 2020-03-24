@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import cv2
 
 def FLANN_matcher(img1, img2, kp1, kp2, des1, des2):
