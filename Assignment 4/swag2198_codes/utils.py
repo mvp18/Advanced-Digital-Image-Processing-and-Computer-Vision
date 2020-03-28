@@ -199,4 +199,4 @@ def dominant_color_transfer(source, target):
     # Reconstruct target image from transformed lab space
     target_rec = lab_to_rgb_img(labm, m, n)
     
-    return target_rec
+    return target_rec # Returns an RGB image

@@ -51,7 +51,7 @@ def crop_region(img):
 		# cv2.waitKey(0)
 
 	cv2.destroyAllWindows()
-	corners = []
+	corners = [] # Global Variable corners flushed
 	return img_cropped
 
 
@@ -66,13 +66,24 @@ def display_dominant_color(img):
 	print('Displaying Dominant Color . . .')
 	print('Press q to quit from windows . . .')
 
-	while True:
-		cv2.imshow('original', img)
-		cv2.imshow('dominant', dom_bgr)
+	# while True:
+	# 	cv2.imshow('original', img)
+	# 	cv2.imshow('dominant', dom_bgr)
 
-		key = cv2.waitKey(1) & 0xFF
-		if key == ord('q'):
-			break
+	# 	key = cv2.waitKey(1) & 0xFF
+	# 	if key == ord('q'):
+	# 		break
 
-	cv2.destroyAllWindows()
-	return pixels
+	# cv2.destroyAllWindows()
+	return dom_bgr, pixels
+
+# Takes 2 BGR cropped images and returns reconstructed target as BGR
+def transfer_dominant_colors(img1_cropped, img2_cropped):
+
+	source = cv2.cvtColor(img1_cropped, cv2.COLOR_BGR2RGB)
+	target = cv2.cvtColor(img2_cropped, cv2.COLOR_BGR2RGB)
+
+	target_rec = dominant_color_transfer(source, target)
+
+	target_rec = cv2.cvtColor(target_rec, cv2.COLOR_RGB2BGR)
+	return target_rec
