@@ -93,7 +93,7 @@ def get_dominant_color(img_rgb, xy_array):
     inds = (np.array(xind), np.array(yind))
         
     dom_bgr = cv2.cvtColor(dom, cv2.COLOR_RGB2BGR)
-    cv2.imwrite('dominant_color1.jpg', dom_bgr)
+    # cv2.imwrite('dominant_color1.jpg', dom_bgr)
     
     return dom, inds # To be used later for color Transfer
 
