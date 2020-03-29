@@ -1,14 +1,21 @@
 from utils import *
 from modules import *
-import argparse
+import sys
 
 
 def main():
 
 	print('\n***** Starting Colorland Tour! *****\n')
 
-	img1 = cv2.imread('IMG_6477.jpg')
-	img2 = cv2.imread('IMG_6481.jpg')
+	if len(sys.argv) != 3:
+		print('Please provide source and target images!')
+		return
+
+	str1 = sys.argv[1]
+	str2 = sys.argv[2]
+
+	img1 = cv2.imread(str1)
+	img2 = cv2.imread(str2)
 
 	print('Press q to quit')
 	while True:
@@ -35,6 +42,9 @@ def main():
 			break
 	# cv2.destroyAllWindows()
 
+	cv2.imwrite('source.png', img1_cropped)
+	cv2.imwrite('target.png', img2_cropped)
+
 	dom1, pixels1 = display_dominant_color(img1_cropped)
 	dom2, pixels2 = display_dominant_color(img2_cropped)
 
@@ -47,9 +57,13 @@ def main():
 			break
 	# cv2.destroyAllWindows()
 
+	cv2.imwrite('source_dominant.png', dom1)
+	cv2.imwrite('target_dominant.png', dom2)
+
 	target_rec = transfer_dominant_colors(img1_cropped, img2_cropped)
 	disp_and_quit(target_rec, 'source image rendered in target illuminant')
 
+	cv2.imwrite('source_in_target_illuminant.png', target_rec)
 	print('\n***** Hope you enjoyed the tour in Colorland! *****\n')
 
 
