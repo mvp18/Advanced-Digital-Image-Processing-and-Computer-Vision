@@ -74,11 +74,17 @@ def find_dominant_color(img):
 
 def transfer_dom_color(source_img, target_img, target_indices):
 
-	target_lab = bgr2l_alpha_beta(target_img[target_indices])
+	rows, cols, channels = source_img.shape
+
+	target_img = cv2.cvtColor(target_img, cv2.COLOR_BGR2RGB)
+
+	target_lab = bgr2l_alpha_beta(target_img[target_indices[0], target_indices[1], :], img_flag=False)
 	source_lab = bgr2l_alpha_beta(source_img)
 
 	lm_am_bm = modify_l_alpha_beta(source_lab, target_lab)
 
-	img_bgr = l_alpha_beta2bgr(lm_am_bm)
+	img_bgr = l_alpha_beta2bgr(lm_am_bm, rows, cols, channels)
 
 	cv2.imshow('Source Image in Target Illumination', img_bgr)
+	cv2.waitKey(0)
+	cv2.destroyAllWindows()

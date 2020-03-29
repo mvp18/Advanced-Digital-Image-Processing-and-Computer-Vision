@@ -18,7 +18,7 @@ def main(args):
 	disp_2imgs(source_crop, source_dom, 'Source cropped', 'Dominant Color Whitened')
 	disp_2imgs(target_crop, target_dom, 'Target cropped', 'Dominant Color Whitened')
 
-	# transfer_dom_color(source_crop, target_crop, target_indices)
+	transfer_dom_color(source_crop, target_crop, target_indices)
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description="Dominant Color Transfer between a pair of images")
