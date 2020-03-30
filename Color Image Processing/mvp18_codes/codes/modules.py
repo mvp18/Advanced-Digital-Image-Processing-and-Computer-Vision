@@ -21,6 +21,8 @@ def click_and_crop(img):
 	cv2.namedWindow('image')
 	cv2.setMouseCallback('image', rect.select_points)
 
+	print('\nPress mouse button down at 1st pt and release at 2nd to crop. Press c once done, r to do it again (if not done properly initially!)')
+
 	while(1):
 		cv2.imshow('image', img)
 		k = cv2.waitKey(1) & 0xFF
@@ -58,33 +60,31 @@ def find_dominant_color(img):
 	dom_indices = np.argwhere(kmeans.labels_==np.argmax(counts)).reshape(-1)
 
 	rows, cols, channels = img.shape
-	indx = []
-	indy = [] 
+	img_indices = []
 
 	for i in range(len(dom_indices)):
 		x = dom_indices[i]//cols
 		y = dom_indices[i]%cols
-		indx.append(x)
-		indy.append(y)
-		clone[x, y] = [255, 255, 255]
+		img_indices.append(dom_indices[i])
+		clone[x, y] = [255, 255, 255] # whitens the pixels belonging to the cluster with the highest count
 
-	img_indices = [np.array(indx), np.array(indy)]
+	# img_indices = tuple(img_indices)
 
 	return clone, img_indices
 
 def transfer_dom_color(source_img, target_img, target_indices):
 
+	print('\nThis function renders the source image with illumination of target image.')
+
 	rows, cols, channels = source_img.shape
 
-	target_img = cv2.cvtColor(target_img, cv2.COLOR_BGR2RGB)
-
-	target_lab = bgr2l_alpha_beta(target_img[target_indices[0], target_indices[1], :], img_flag=False)
+	target_rgb_mat = bgr_img2rgb_matrix(target_img)
+	target_lab = bgr2l_alpha_beta(target_rgb_mat[:, target_indices], img_flag=False)
+	
 	source_lab = bgr2l_alpha_beta(source_img)
 
 	lm_am_bm = modify_l_alpha_beta(source_lab, target_lab)
 
 	img_bgr = l_alpha_beta2bgr(lm_am_bm, rows, cols, channels)
 
-	cv2.imshow('Source Image in Target Illumination', img_bgr)
-	cv2.waitKey(0)
-	cv2.destroyAllWindows()
+	return img_bgr
