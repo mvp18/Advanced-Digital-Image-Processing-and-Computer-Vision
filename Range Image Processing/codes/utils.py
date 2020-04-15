@@ -1,6 +1,12 @@
 import cv2
 import numpy as np
-from collections import defaultdict
+import random
+
+def isvalid(i, j, r, c):
+	
+	if i >= r or j >= c or i < 0 or j < 0:
+		return 0
+	return 1
 
 def NPS_pixel(img, pix, threshold):
 
@@ -41,9 +47,27 @@ def NPS_pixel(img, pix, threshold):
 				for k in pt2plane[(x, y, z)]:
 					DNP_dict[k]+=1
 
-	NPS = []
+	NPS_planes = []
+	NPS_bin = ['0']*9
 	for plane in DNP_dict:
 		if DNP_dict[plane]>threshold:
-			NPS.append(plane)
+			NPS_bin[9-plane]='1'
+			NPS_planes.append(plane)
 
-	return NPS
+	NPS_bin = "".join(NPS_bin)
+	NPS_dec = int(NPS_bin, 2)
+
+	# print("[{}][{}] : {}; {}".format(pix[0], pix[1], NPS_planes, NPS_dec))
+
+	return NPS_dec
+
+def dfs_visit(NPS_img, visited, out_img, i, j, r, c, label):
+
+	visited[i, j] = 1
+	out_img[i, j] = label
+
+	for k in range(i-1, i+2):
+		for l in range(j-1, j+2):
+			if isvalid(k, l, r, c):
+				if (visited[k, l]==0 and NPS_img[k, l]==NPS_img[i, j]):
+						dfs_visit(NPS_img, visited, out_img, k, l, r, c, label)

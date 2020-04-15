@@ -55,8 +55,37 @@ def topology_K2K1(K2, K1):
 
 def find_NPS(img, threshold):
 
+	NPS_img = np.zeros((img.shape[0], img.shape[1]))
 	for i in range(img.shape[0]):
 		for j in range(img.shape[1]):
-			print("[{}][{}] : {}".format(i, j, NPS_pixel(img, (i, j), threshold)))
+			NPS_img[i, j] = NPS_pixel(img, (i, j), threshold)
+
+	return NPS_img
+
+def seg_NPS(NPS_img):
+
+	r, c = NPS_img.shape
+	label = 1
+
+	visited = np.zeros((r, c))
+	out_img = np.zeros((r, c))
+
+	# init_index = (random.randint(0, r), random.randint(0, c))
+
+	# for i in range(r):
+	# 	for j in range(c):
+	loop_counter = 0
+	while np.count_nonzero(visited)!=r*c:
+		if loop_counter:
+			[row, col] = np.where(visited==0)
+			(i, j) = (random.choice(row), random.choice(col))
+		else:
+			(i, j) = (random.randint(0, r), random.randint(0, c))			
+		# if visited[i, j]==0:
+		dfs_visit(NPS_img, visited, out_img, i, j, r, c, label)
+		label+=1
+		loop_counter+=1
+	
+	return out_img
 
 	

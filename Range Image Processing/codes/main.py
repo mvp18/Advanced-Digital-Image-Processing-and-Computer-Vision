@@ -1,6 +1,9 @@
-import argparse 
+import argparse
+import sys
 from utils import *
 from modules import *
+
+sys.setrecursionlimit(10**8)
 
 def main(args):
 
@@ -22,19 +25,22 @@ def main(args):
 	# cv2.waitKey(0)
 	# cv2.destroyAllWindows()
 
-	H, K = mean_and_gaussian_curvatures(Ix, Iy, Ixx, Iyy, Ixy)
-	K1, K2 = principal_curvatures(H, K)
+	# H, K = mean_and_gaussian_curvatures(Ix, Iy, Ixx, Iyy, Ixy)
+	# K1, K2 = principal_curvatures(H, K)
 
-	for i in range(range_img.shape[0]):
-		for j in range(range_img.shape[1]):
-			H = np.sign(H[i][j])
-			K = np.sign(K[i][j])
-			K1 = np.sign(K1[i][j])
-			K2 = np.sign(K2[i][j])
-			# print("H:{}, K:{}, K1:{}, K2:{}".format(H[i][j], K[i][j], K1[i][j], K2[i][j]))
-			print('Point [{}][{}]; Topology by HK:{}; Topology by K1K2:{}'.format(i, j, topology_HK(H, K), topology_K2K1(K2, K1))
+	# for i in range(range_img.shape[0]):
+	# 	for j in range(range_img.shape[1]):
+	# 		H = np.sign(H[i][j])
+	# 		K = np.sign(K[i][j])
+	# 		K1 = np.sign(K1[i][j])
+	# 		K2 = np.sign(K2[i][j])
+	# 		# print("H:{}, K:{}, K1:{}, K2:{}".format(H[i][j], K[i][j], K1[i][j], K2[i][j]))
+	# 		print('Point [{}][{}]; Topology by HK:{}; Topology by K1K2:{}'.format(i, j, topology_HK(H, K), topology_K2K1(K2, K1)))
 
-	find_NPS(range_img, args.DNP_thresh)
+	NPS_img = find_NPS(range_img, args.DNP_thresh)
+
+	imgseg_NPS = seg_NPS(NPS_img)
+	print(imgseg_NPS)
 
 	# disp_2imgs(source_crop, source_dom, 'Source cropped', 'Dominant Color Whitened', args.save_flag, args.img1[:-4]+'_dominant_color.jpg')
 
