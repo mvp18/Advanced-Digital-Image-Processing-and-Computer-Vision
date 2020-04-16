@@ -8,7 +8,19 @@ def isvalid(i, j, r, c):
 		return 0
 	return 1
 
-def NPS_pixel(img, pix, threshold):
+def disp_2imgs(img1, img2, str1, str2, save_flag, save_name):
+
+	combined_img = np.hstack((img1, img2))
+
+	cv2.imshow(str1+' (Left) ' + str2 + ' (Right) ', combined_img)
+	cv2.waitKey(0)
+	cv2.destroyAllWindows()
+
+	if save_flag:
+		cv2.imwrite('../sample_results/'+save_name, combined_img)
+		print('\nImage saved to disk!')
+
+def NPS_pixel(img, pix, threshold, print_flag):
 
 	neighborhood_3D = np.zeros((3, 3, 3))
 	
@@ -57,11 +69,12 @@ def NPS_pixel(img, pix, threshold):
 	NPS_bin = "".join(NPS_bin)
 	NPS_dec = int(NPS_bin, 2)
 
-	# print("[{}][{}] : {}; {}".format(pix[0], pix[1], NPS_planes, NPS_dec))
+	if print_flag:
+		print("[{}][{}] : {}".format(pix[0], pix[1], NPS_planes))
 
 	return NPS_dec
 
-def dfs_visit(NPS_img, visited, out_img, i, j, r, c, label):
+def dfs_visit(A, visited, out_img, i, j, r, c, label):
 
 	visited[i, j] = 1
 	out_img[i, j] = label
@@ -69,5 +82,58 @@ def dfs_visit(NPS_img, visited, out_img, i, j, r, c, label):
 	for k in range(i-1, i+2):
 		for l in range(j-1, j+2):
 			if isvalid(k, l, r, c):
-				if (visited[k, l]==0 and NPS_img[k, l]==NPS_img[i, j]):
-						dfs_visit(NPS_img, visited, out_img, k, l, r, c, label)
+				if (visited[k, l]==0 and A[k, l]==A[i, j]):
+						dfs_visit(A, visited, out_img, k, l, r, c, label)
+
+def bfs_visit(A, visited, label_img, i, j, r, c, label):
+
+	queue = []
+	visited[i, j] = 1
+	label_img[i, j] = label
+	queue.append((i, j))
+
+	while queue:
+		pix = queue.pop(0)
+		for k in range(pix[0]-1, pix[0]+2):
+			for l in range(pix[1]-1, pix[1]+2):
+				if isvalid(k, l, r, c):
+					if (visited[k, l]==0 and A[k][l]==A[pix[0]][pix[1]]):
+							queue.append((k, l))
+							visited[k, l] = 1
+							label_img[k, l] = label
+
+def generate_seg_img(label_img, r, c, smooth_thresh):
+
+	out_img = np.zeros((r, c), dtype=np.uint8)
+
+	unique_ele, count = np.unique(label_img, return_counts=True)
+	unique_ele = list(unique_ele)
+	label_with_max_count = unique_ele[np.argmax(count)]
+	# sort_count_index = np.argsort(count)
+	# count_arr_sorted = count[sort_count_index]
+
+	for i in range(r):
+		for j in range(c):
+			pix_label = label_img[i, j]
+			if count[unique_ele.index(pix_label)]<smooth_thresh*np.max(count):
+				label_img[i, j] = label_with_max_count
+
+	unique_ele, count = np.unique(label_img, return_counts=True)
+	
+	# print(unique_ele)
+	print('\nNumber of connected components found : {}.'.format(len(unique_ele)))
+	# print(count)
+
+	sort_count_index = np.argsort(count)
+	unique_ele = unique_ele[sort_count_index]
+	# unique_ele = list(unique_ele)
+	color = np.array([(255-i) for i in range(len(count))])
+	color[color<0] = 0
+	color[len(color)-1] = 0
+	label2color = dict(zip(unique_ele, color))
+
+	for i in range(r):
+		for j in range(c):
+			out_img[i, j] = label2color[label_img[i, j]]
+
+	return out_img
