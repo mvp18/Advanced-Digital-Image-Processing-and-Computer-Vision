@@ -1,9 +1,9 @@
 import argparse
-import sys
+# import sys
 from utils import *
 from modules import *
 
-sys.setrecursionlimit(10**8)
+# sys.setrecursionlimit(10**8)
 
 def main(args):
 
@@ -44,7 +44,7 @@ def main(args):
 	savename_dict = {0:'img_'+args.range_img[0]+'_seg_NPS_thresh_'+str(args.DNP_thresh), 1:'img_'+args.range_img[0]+'_seg_gaussian', 
 					 2:'img_'+args.range_img[0]+'_seg_principal'}
 
-	print('Generating Segmented Range Image.......\n')
+	print('\nGenerating Segmented Range Image.......\n')
 	
 	imgseg = seg_dict[args.seg_method]
 
@@ -55,7 +55,7 @@ if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description="Range Image Processing")
 	
 	parser.add_argument('-range', '--range_img', help="specify source image name, image should be in RGBD_dataset directory", default='0.png', type=str)
-	parser.add_argument('-th', '--DNP_thresh', help="minimum number of pts for accepting DNP into NPS", default=3, type=int)
+	parser.add_argument('-th', '--DNP_thresh', help="minimum number of pts for accepting DNP into NPS", default=5, type=int)
 	parser.add_argument('-seg', '--seg_method', help="method of segmentation - NPS (0), gaussian curvature (1) and principal curvature(2)",
 						default=0, type=int)
 	parser.add_argument('-save', '--save_flag', help="specify whether u want to save outputs(1) or just show them(0)", default=0, type=int)
