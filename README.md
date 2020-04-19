@@ -22,9 +22,9 @@ Here a brief outline of the **main** algorithms implemented is given.
 - Transferring the dominant color to another image via color space transformations. [*[Reference Paper]*](https://github.com/mvp18/Advanced-Digital-Image-Processing-and-Computer-Vision/blob/master/Color%20Image%20Processing/relevant%20papers/ColorTransfer_2001_global(slide_algo).pdf)
 
 ## 5. Range Image Processing
-- Point 1.
-- Point 2.
-- Point3.
+- Finding curvatures (mean, gaussian and principal) and associated topologies at each point of range data.
+- Computation of Neighborhood Plane Set (NPS) at each pixel.
+- Region Growing of homogenous labels using principal and gaussian curvatures and NPS. [*[Reference Papers]*](https://github.com/mvp18/Advanced-Digital-Image-Processing-and-Computer-Vision/blob/master/Range%20Image%20Processing/relevant%20papers)
 
 # Running Instructions and Requirements
 A detailed description of the functions and methods implemented along with **running instructions** and **requirements info** can be found in the respective documentation files (*pdf*) inside each folder. As an example, this is the [documentation](https://github.com/mvp18/Advanced-Digital-Image-Processing-and-Computer-Vision/blob/master/Stereogeometry/submission%20folder/Assignment-%203%20Documentation.pdf) of the third assignment (Stereogeometry).

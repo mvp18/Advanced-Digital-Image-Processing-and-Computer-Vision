@@ -66,8 +66,10 @@ while(1):
 		show_or_print('sharpened.png', sharpened, cmap='gray')
 
 	if operation==3:
-		_, _, grads = edge_sobel(blur)
+		Ix, Iy, grads = edge_sobel(blur)
 		show_or_print('sobeledges.png',grads, cmap='gray')
+		show_or_print('sobeledges.png',Ix, cmap='gray')
+		show_or_print('sobeledges.png',Iy, cmap='gray')
 
 	if operation==4:
 		show_or_print('otsu.png', otsu_thresh, cmap='gray')
